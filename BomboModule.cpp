@@ -1,39 +1,4 @@
-/** 
- * This is an example that demonstrates the use a Transposer to transpose the
- * note events sent out by NoteButton%s.
- *
- * @boards  AVR, AVR USB, Due, Nano 33, Teensy 3.x, ESP32
- * 
- * Connections
- * -----------
- * 
- * - 2-9: momentary push buttons (to ground) to use as "piano keys"
- * - 10: momentary push button (to ground) to transpose one semitone up
- * - 11: momentary push button (to ground) to transpose one semitone down
- * 
- * The internal pull-up resistor for the buttons will be enabled automatically.
- * 
- * Behavior
- * --------
- * 
- * - By default, the 8 push buttons on pins 2-9 send MIDI Note events for notes
- *   C4 - C5.
- * - If you press the push button on pin 10, all notes are transposed one 
- *   semitone up.
- * - If you press the push button on pin 11, all notes are transposed one 
- *   semitone down.
- * - If you press the push buttons on pins 10 and 11 simultaneously, the 
- *   transposer resets.
- * 
- * Mapping
- * -------
- * 
- * Route the Arduino MIDI port into a synth to play the notes.
- * 
- * Written by PieterP, 2019-10-26  
- * https://github.com/tttapa/Control-Surface
- */
- 
+
 #include <Control_Surface.h> // Include the Control Surface library
 
 #include <Wire.h> 
@@ -45,6 +10,30 @@ USBMIDI_Interface midi;
  
 using namespace MIDI_Notes;
  
+CCAbsoluteEncoder encBombo = {
+  {9, 10},       // pins
+  {10, Channel_16, Cable_1}, // MIDI address (CC number + optional channel)
+  1,            // optional multiplier if the control isn't fast enough
+};
+
+class EncoderValues {
+  private:
+      int storedValue;
+
+  public:
+      EncoderValues() {
+          storedValue = 0;
+      }
+
+      void updateValue(int newValue) {
+          storedValue = newValue;
+      }
+
+      int getValue() {
+          return storedValue;
+      }
+};
+
 // Instantiate a Transposer that can transpose from one octave down to one
 // octave up
 Transposer<-12, +12> transposer;
@@ -60,15 +49,21 @@ Bankable::NoteButton buttons[] = {
   {transposer, 2, {MIDI_Notes::C[2], Channel_16}},
 };
 
-CCAbsoluteEncoder encBombo = {
-  {9, 10},       // pins
-  {10, Channel_16, Cable_1}, // MIDI address (CC number + optional channel)
-  1,            // optional multiplier if the control isn't fast enough
-};
+EncoderValues EncoderPos8;
+EncoderValues EncoderPos9;
+EncoderValues EncoderPos10;
+EncoderValues EncoderPos11;
+EncoderValues EncoderPos12;
+EncoderValues EncoderPos13;
+EncoderValues EncoderPos14;
+EncoderValues EncoderPos15;
+EncoderValues EncoderPos16;
+EncoderValues EncoderPos17;
+EncoderValues EncoderPos18;
  
 void setup() {
   Control_Surface.begin(); // Initialize Control Surface
-  Serial.begin(9600);
+  //Serial.begin(9600);
 
   lcd.init();
   lcd.backlight();
@@ -80,26 +75,130 @@ void setup() {
   lcd.print("BO:");
   lcd.setCursor(4, 1);
   lcd.print("01");
+  lcd.setCursor(8, 1);
+  lcd.print("Pch:");
+  lcd.setCursor(13, 1);
+  lcd.print("000");
 
 }
 
 int previusTransposePos = 0;
+
+int previousEncVal8 = 0;
+int previousEncVal9 = 0;
+int previousEncVal10 = 0;
+int previousEncVal11 = 0;
+int previousEncVal12 = 0;
+int previousEncVal13 = 0;
+int previousEncVal14 = 0;
+int previousEncVal15 = 0;
+int previousEncVal16 = 0;
+int previousEncVal17 = 0;
+int previousEncVal18 = 0;
 
 void loop() {
   bomboModule();
   Control_Surface.loop(); // Update the Control Surface
 }
 
-
 void bomboModule(){
-
  int transposePos = transposer.getTranspositionSemitones();
   int mappedTransposerBomboPos = map(transposePos,-12,12,1,25);
   encBombo.setAddress(mappedTransposerBomboPos);
+
+  // Serial.println(encBombo.getValue());
+  //*****************************************************************
+  // This block arrages the zero on the left of the pitch indicator
+  //*****************************************************************
+  lcd.setCursor(13, 1);
+  int pitchCurrentValue = encBombo.getValue();
+  if (pitchCurrentValue < 10) {
+    lcd.print("00"+ String(encBombo.getValue()));
+  }
+  else if (pitchCurrentValue >= 10 and pitchCurrentValue < 100){
+    lcd.print("0"+ String(encBombo.getValue()));
+  }
+  else {
+    lcd.print(String(encBombo.getValue()));
+  }
+  //*****************************************************************
+  //*****************************************************************
+  
   int currentTransposePos = mappedTransposerBomboPos;
+
   // logic bridge
   if (currentTransposePos != previusTransposePos) {
     previusTransposePos = currentTransposePos;
+
+    switch (previusTransposePos) {
+
+      case 8:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos8.getValue());
+        break;
+
+      case 9:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos9.getValue());
+        break;
+
+      case 10:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos10.getValue());
+        break;
+
+      case 11:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos11.getValue());
+        break;
+
+      case 12:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos12.getValue());
+        break;
+
+      case 13:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos13.getValue());
+        break;
+        
+      case 14:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos14.getValue());
+        break;
+
+      case 15:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos15.getValue());
+        break;
+
+      case 16:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos16.getValue());
+        break;
+
+      case 17:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos17.getValue());
+        break;
+
+      case 18:
+        lcd.setCursor(13, 1);
+        lcd.print("000");
+        encBombo.setValue(EncoderPos18.getValue());
+        break;      
+    }
+
     lcd.setCursor(4, 1);
     if (previusTransposePos < 10) {
       lcd.print("0" + String(previusTransposePos));
@@ -109,6 +208,55 @@ void bomboModule(){
     
   }
 
-  Serial.println(mappedTransposerBomboPos);
+  int currentRotarValue = encBombo.getValue();
+
+  switch (currentTransposePos) {
+
+    case 8:
+      EncoderPos8.updateValue(currentRotarValue);
+      currentRotarValue 
+      break;
+    case 9:
+      EncoderPos9.updateValue(currentRotarValue);
+      break;
+
+    case 10:
+      EncoderPos10.updateValue(currentRotarValue);
+      break;
+
+    case 11:
+      EncoderPos11.updateValue(currentRotarValue);
+      break;
+
+    case 12:
+      EncoderPos12.updateValue(currentRotarValue);
+      break;
+
+    case 13:
+      EncoderPos13.updateValue(currentRotarValue);
+      break;
+      
+    case 14:
+      EncoderPos14.updateValue(currentRotarValue);
+      break;
+
+    case 15:
+      EncoderPos15.updateValue(currentRotarValue);
+      break;
+  
+    case 16:
+      EncoderPos16.updateValue(currentRotarValue);
+      break;
+
+    case 17:
+      EncoderPos17.updateValue(currentRotarValue);
+      break;
+    case 18:
+      EncoderPos18.updateValue(currentRotarValue);
+      break;
+    
+  }
+
+  //Serial.println(mappedTransposerBomboPos);
   
 }

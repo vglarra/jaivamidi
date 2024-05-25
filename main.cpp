@@ -310,7 +310,7 @@ void manageCCchange(int offset){
       enc.setAddress(CcBtnCount + offset);
     } 
     else {
-      enc.setAddress(1 + offset);
+       .setAddress(1 + offset);
       CcBtnCount = 1;
     }
   }    // if the button is pressed

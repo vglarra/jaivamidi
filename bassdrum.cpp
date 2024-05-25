@@ -12,7 +12,6 @@ void setup() {
   Control_Surface.begin();
   pushbutton.begin(); // enables internal pull-up
   midi.begin();       // initialize the MIDI interface
-  Serial.begin(9600);
 }
 
 void loop() {
@@ -28,7 +27,6 @@ void loop() {
 
   if (pushbutton.getState() == Button::Falling) {
     midi.sendNoteOn(noteAddress, velocity);
-    Serial.println(String(velocity));
   } // send a note on event
   else if (pushbutton.getState() == Button::Rising) {
     midi.sendNoteOff(noteAddress, velocity);

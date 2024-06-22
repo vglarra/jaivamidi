@@ -1,4 +1,6 @@
-
+//************************************************************************
+// Permite encender y apaga 16 leds usando MCP23017
+//************************************************************************
 #include <Adafruit_MCP23X17.h>
 
 #include <Wire.h> 
@@ -8,22 +10,10 @@ LiquidCrystal_I2C lcd(0x27,16,2);
 Adafruit_MCP23X17 mcpOUT;
 Adafruit_MCP23X17 mcpIN;
 
-const int buttonPin0 = 0; // Change this to your actual button pin
-const int buttonPin1 = 1; // Change this to your actual button pin
-const int buttonPin2 = 2;
-
-const int led0 = 0;
-const int led1 = 1; // #define LED_PIN 10     // MCP23XXX pin LED is attached to
-const int led2 = 2;
-
-
-
-int cnt = 0;
-
+int ledsOffCounter = 0;
 
 void setup() {
   Wire.begin();
-
 
   Serial.begin(9600);
 
@@ -36,23 +26,54 @@ void setup() {
       Serial.println("Error initializing MCP23017-2");
       while (1);
   }
-
+  //**********(MCP23X17)****************
   mcpOUT.begin_I2C(0x20);
   mcpIN.begin_I2C(0x21);
-
+  //*******************************
+  //**********(LED)*********************
   mcpIN.pinMode(0, INPUT_PULLUP);
   mcpIN.pinMode(1, INPUT_PULLUP);
   mcpIN.pinMode(2, INPUT_PULLUP); 
-  
+  mcpIN.pinMode(3, INPUT_PULLUP);
+  mcpIN.pinMode(4, INPUT_PULLUP);
+  mcpIN.pinMode(5, INPUT_PULLUP); 
+  mcpIN.pinMode(6, INPUT_PULLUP);
+  mcpIN.pinMode(7, INPUT_PULLUP);
+  mcpIN.pinMode(8, INPUT_PULLUP); 
+  mcpIN.pinMode(9, INPUT_PULLUP);
+  mcpIN.pinMode(10, INPUT_PULLUP);
+  mcpIN.pinMode(11, INPUT_PULLUP); 
+  mcpIN.pinMode(12, INPUT_PULLUP); 
+  mcpIN.pinMode(13, INPUT_PULLUP);
+  mcpIN.pinMode(14, INPUT_PULLUP);
+  mcpIN.pinMode(15, INPUT_PULLUP); 
+  //*******************************
+  //**********(Switch)******************
   mcpOUT.pinMode(0, OUTPUT);
   mcpOUT.pinMode(1, OUTPUT);
   mcpOUT.pinMode(2, OUTPUT);
+  mcpOUT.pinMode(3, OUTPUT);
+  mcpOUT.pinMode(4, OUTPUT);
+  mcpOUT.pinMode(5, OUTPUT);
+  mcpOUT.pinMode(6, OUTPUT);
+  mcpOUT.pinMode(7, OUTPUT);
+  mcpOUT.pinMode(8, OUTPUT);
+  mcpOUT.pinMode(9, OUTPUT);
+  mcpOUT.pinMode(10, OUTPUT);
+  mcpOUT.pinMode(11, OUTPUT);
+  mcpOUT.pinMode(12, OUTPUT);
+  mcpOUT.pinMode(13, OUTPUT);
+  mcpOUT.pinMode(14, OUTPUT);
+  mcpOUT.pinMode(15, OUTPUT);
+  //*******************************
 
   LedsOff();
 
+  //**********(LCD Screen init)******************
   lcd.init();
   lcd.backlight();
   lcd.clear();
+//*******************************
 
 	// Turn on the blacklight and print a message.
   lcd.setCursor(0, 0);
@@ -74,52 +95,100 @@ void setup() {
   
 }
 
-int cnt1 = 0;
-int buttonState = 0; // Initial button state (not pressed)
-bool ledState = false;    // Initial LED state (off)
+int ledOnOffCounter = 0;
 
 void loop() {
 
-  if (cnt1 < 16){
+  if (ledOnOffCounter < 16){
 
-    if (mcpIN.digitalRead(cnt1)==LOW) {
-      switch (cnt1) {
+    if (mcpIN.digitalRead(ledOnOffCounter)==LOW) {
+      switch (ledOnOffCounter) {
         case 0:
-          Serial.println("boton_0");
-          mcpOUT.digitalWrite(0,HIGH);
-          mcpOUT.digitalWrite(1,LOW);
-          mcpOUT.digitalWrite(2,LOW);
+          lightOnLed(ledOnOffCounter);
           break;
 
         case 1:
-          Serial.println("boton_1");
-          mcpOUT.digitalWrite(0,LOW);
-          mcpOUT.digitalWrite(1,HIGH);
-          mcpOUT.digitalWrite(2,LOW);
+          lightOnLed(ledOnOffCounter);
           break;
 
         case 2:
-          Serial.println("boton_2");
-          mcpOUT.digitalWrite(0,LOW);
-          mcpOUT.digitalWrite(1,LOW);
-          mcpOUT.digitalWrite(2,HIGH);
+          lightOnLed(ledOnOffCounter);
           break;
 
-      }
+        case 3:
+          lightOnLed(ledOnOffCounter);
+          break;
 
+        case 4:
+          lightOnLed(ledOnOffCounter);
+          break;
+          
+        case 5:
+          lightOnLed(ledOnOffCounter);
+          break;
+
+        case 6:
+          lightOnLed(ledOnOffCounter);
+          break;
+          
+        case 7:
+          lightOnLed(ledOnOffCounter);
+          break;
+
+        case 8:
+          lightOnLed(ledOnOffCounter);
+          break;
+          
+        case 9:
+          lightOnLed(ledOnOffCounter);
+          break;
+
+        case 10:
+          lightOnLed(ledOnOffCounter);
+          break;
+          
+        case 11:
+          lightOnLed(ledOnOffCounter);
+          break;
+
+        case 12:
+          lightOnLed(ledOnOffCounter);
+          break;
+
+        case 13:
+          lightOnLed(ledOnOffCounter);
+          break;
+          
+        case 14:
+          lightOnLed(ledOnOffCounter);
+          break;
+
+        case 15:
+          lightOnLed(ledOnOffCounter);
+          break;
+      }
     }
   }
   else {
-    cnt1 = -1;
+    ledOnOffCounter = -1;
   }
-  cnt1++;
+  ledOnOffCounter++;
 }
 
 void LedsOff() {
-  while (cnt < 16){
-    mcpOUT.digitalWrite(cnt,LOW);
-    cnt++;
+  while (ledsOffCounter < 16){
+    mcpOUT.digitalWrite(ledsOffCounter,LOW);
+    ledsOffCounter++;
   }
-  cnt = 0;
+  ledsOffCounter = 0;
   mcpOUT.digitalWrite(0,HIGH);
+}
+
+void lightOnLed(int ledPos) {
+  mcpOUT.digitalWrite(ledPos,HIGH);
+  for (int i = 0; i < 16; i++){
+    if (i != ledPos){
+      mcpOUT.digitalWrite(i,LOW);
+    }
+  }
 }

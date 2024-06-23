@@ -1,9 +1,9 @@
 
 //*************************************************************************
-//Board: teensy 4.1
-//Código controla 16 canales midi's con inputs teensy 2,3
-//3 bancos con inputs teensy 4,5
-//16 CC messages con inputs teensy 8,9
+// Board: teensy 4.1
+// Código controla 16 canales midi's con inputs teensy 2,3
+// 3 bancos con inputs teensy 4,5
+// 16 CC messages con inputs teensy 8,9
 //**************************************
 
 // MIDI Libs
